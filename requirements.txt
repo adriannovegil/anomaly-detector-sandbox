@@ -1,0 +1,7 @@
+pandas
+schedule
+prometheus_client
+prometheus_api_client
+tornado
+fbprophet
+mlflow
