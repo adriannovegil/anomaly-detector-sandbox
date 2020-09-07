@@ -11,7 +11,7 @@ services:
     environment:
       - FLT_PROM_URL=http://192.168.88.251:9090
       - FLT_PROM_ACCESS_TOKEN=
-      - FLT_METRICS_LIST=process_cpu_usage{service='admin-server'}
+      - FLT_METRICS_LIST=process_cpu_usage{service='admin-server'};process_cpu_usage{service='config-server'};process_cpu_usage{service='discovery-server'};process_cpu_usage{service='api-gateway'};process_cpu_usage{service='vets-service'};process_cpu_usage{service='customers-service'};process_cpu_usage{service='visits-service'}
       - FLT_RETRAINING_INTERVAL_MINUTES=15
       - FLT_ROLLING_TRAINING_WINDOW_SIZE=15d
       - FLT_DEBUG_MODE=True
@@ -29,3 +29,27 @@ services:
       - .:/pad
     ports:
       - 8080:8080
+
+  # Metrics
+  # ============================================================================
+  # Prometheus
+  prometheus-server:
+    image: prom/prometheus:v2.15.1
+    container_name: prometheus
+    volumes:
+      - ./docker/prometheus-server/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+  # Grafana
+  grafana-server:
+    build: ./docker/grafana-server
+    image: inspectit/inspectit-grafana-server
+    container_name: inspectit-grafana-server
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=demo
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+    volumes:
+      - ./docker/grafana-server/provisioning:/usr/share/grafana/custom/
+    ports:
+      - 3000:3000
