@@ -11,7 +11,7 @@ services:
       - FLT_PROM_ACCESS_TOKEN=
       - FLT_METRICS_LIST=system_cpu_usage{service='admin-server'};system_cpu_usage{service='config-server'};system_cpu_usage{service='discovery-server'};system_cpu_usage{service='api-gateway'};system_cpu_usage{service='vets-service'};system_cpu_usage{service='customers-service'};system_cpu_usage{service='visits-service'}
       - FLT_RETRAINING_INTERVAL_MINUTES=15
-      - FLT_ROLLING_TRAINING_WINDOW_SIZE=15d
+      - FLT_ROLLING_TRAINING_WINDOW_SIZE=24h
       - FLT_DEBUG_MODE=True
       - APP_FILE=/pad/app.py
     volumes:

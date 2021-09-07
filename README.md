@@ -29,7 +29,8 @@ The time series forecasting performed by the models can be used by developers to
 If you want to execute the application, you can do the following:
 
 ```
- $ docker-compose up
+docker-compose build
+docker-compose up
 ```
 
 ## Implementation

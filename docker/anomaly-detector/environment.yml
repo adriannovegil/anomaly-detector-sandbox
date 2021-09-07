@@ -3,9 +3,9 @@ name: prophet-env
 channels:
   - conda-forge
 dependencies:
-  - python=3.6
+  - python=3.8
   - pip
-  - fbprophet
+  - prophet
   - pip:
       - pandas
       - schedule
@@ -14,3 +14,6 @@ dependencies:
       - tornado
       - dateparser
       - mlflow
+      - numpy
+      - tensorflow >=2.0,<2.5
+      - scikit-learn
