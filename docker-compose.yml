@@ -1,55 +1,72 @@
 version: '3.8'
-services:
 
-  # Anomaly Detector
-  # ============================================================================
+services:
   # Anomaly Detector
   anomaly-detector:
     build: ./docker/anomaly-detector
     image: pad/anomaly-detector-prometheus
     container_name: anomaly-detector-prometheus
     environment:
-      - FLT_PROM_URL=http://192.168.88.251:9090
+      - FLT_PROM_URL=http://thanos-querier:10902
       - FLT_PROM_ACCESS_TOKEN=
-      - FLT_METRICS_LIST=process_cpu_usage{service='admin-server'};process_cpu_usage{service='config-server'};process_cpu_usage{service='discovery-server'};process_cpu_usage{service='api-gateway'};process_cpu_usage{service='vets-service'};process_cpu_usage{service='customers-service'};process_cpu_usage{service='visits-service'}
+      - FLT_METRICS_LIST=system_cpu_usage{service='admin-server'};system_cpu_usage{service='config-server'};system_cpu_usage{service='discovery-server'};system_cpu_usage{service='api-gateway'};system_cpu_usage{service='vets-service'};system_cpu_usage{service='customers-service'};system_cpu_usage{service='visits-service'}
       - FLT_RETRAINING_INTERVAL_MINUTES=15
       - FLT_ROLLING_TRAINING_WINDOW_SIZE=15d
       - FLT_DEBUG_MODE=True
       - APP_FILE=/pad/app.py
-    #entrypoint: ["sh", "-c","
-    #  ./dockerize -wait=tcp://discovery-server:8761 \
-    #              -wait=tcp://ocelot-config-server:8090 \
-    #              -wait=tcp://influxdb-server:8086 \
-    #              -wait=tcp://tracing-server:9411  \
-    #              -timeout=300s -- &&
-    #  java -XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
-    #  -javaagent:/agent/inspectit-ocelot-agent.jar
-    #  org.springframework.boot.loader.JarLauncher"]
     volumes:
       - .:/pad
     ports:
-      - 8080:8080
+      - 8070:8080
+    networks:
+      - observabilitysandbox
+    restart: always
+    labels:
+      org.label-schema.group: "observability"
 
-  # Metrics
-  # ============================================================================
-  # Prometheus
-  prometheus-server:
-    image: prom/prometheus:v2.15.1
-    container_name: prometheus
+  # Anomaly Prometheus Server
+  anomaly-prometheus-server:
+    image: prom/prometheus:v2.29.2
     volumes:
       - ./docker/prometheus-server/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-      - 9090:9090
+      - 9080:9090
+    networks:
+      - observabilitysandbox
+    restart: always
+    labels:
+      org.label-schema.group: "observability"
 
-  # Grafana
-  grafana-server:
-    build: ./docker/grafana-server
-    image: inspectit/inspectit-grafana-server
-    container_name: inspectit-grafana-server
+  # Anomaly Grafana Server
+  anomaly-grafana-server:
+    image: grafana/grafana:8.1.2
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=demo
-      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
     volumes:
-      - ./docker/grafana-server/provisioning:/usr/share/grafana/custom/
+      - ./docker/grafana-server/etc:/etc/grafana:ro
+      - ./docker/grafana-server/dashboards:/var/lib/grafana/dashboards
+      - grafana-lib:/var/lib/grafana
+      - grafana-log:/var/log/grafana
     ports:
-      - 3000:3000
+      - 3001:3000
+    networks:
+      - observabilitysandbox
+    restart: always
+    labels:
+      org.label-schema.group: "observability"
+
+volumes:
+  grafana-lib:
+    external: false
+  grafana-log:
+    external: false
+
+networks:
+  observabilitysandbox:
+    name: observabilitysandbox
+    external: true

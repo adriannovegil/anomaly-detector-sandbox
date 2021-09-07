@@ -1,0 +1,14 @@
+apiVersion: 1
+
+providers:
+  - name: 'Anomaly Detection'
+    orgId: 1
+    folder: 'Anomaly Detection'
+    folderUid: ''
+    type: file
+    disableDeletion: true
+    editable: true
+    updateIntervalSeconds: 10 #how often Grafana will scan for changed dashboards
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/anomaly-detection

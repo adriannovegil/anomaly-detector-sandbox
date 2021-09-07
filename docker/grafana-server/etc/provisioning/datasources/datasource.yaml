@@ -1,0 +1,48 @@
+# config file version
+apiVersion: 1
+
+datasources:
+  # Local Prometheus
+- name: LocalPrometheus
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://anomaly-prometheus-server:9090
+  password:
+  user:
+  database:
+  basicAuth:
+  basicAuthUser:
+  basicAuthPassword:
+  withCredentials:
+  isDefault:
+  jsonData:
+    timeInterval: "15s"
+  secureJsonData:
+    tlsCACert: "..."
+    tlsClientCert: "..."
+    tlsClientKey: "..."
+  version: 1
+  editable: false
+  # Remote Prometheus
+- name: RemotePrometheus
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://thanos-querier:10902
+  password:
+  user:
+  database:
+  basicAuth:
+  basicAuthUser:
+  basicAuthPassword:
+  withCredentials:
+  isDefault:
+  jsonData:
+    timeInterval: "15s"
+  secureJsonData:
+    tlsCACert: "..."
+    tlsClientCert: "..."
+    tlsClientKey: "..."
+  version: 1
+  editable: false
