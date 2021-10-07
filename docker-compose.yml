@@ -15,7 +15,7 @@ services:
       - FLT_DEBUG_MODE=True
       - APP_FILE=/pad/app.py
     volumes:
-      - ./anomaly-detector:/pad
+      - ./docker/anomaly-detector:/pad
     ports:
       - 8070:8080
     networks:
