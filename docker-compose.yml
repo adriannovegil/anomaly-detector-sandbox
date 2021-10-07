@@ -13,9 +13,7 @@ services:
       - FLT_RETRAINING_INTERVAL_MINUTES=15
       - FLT_ROLLING_TRAINING_WINDOW_SIZE=24h
       - FLT_DEBUG_MODE=True
-      - APP_FILE=/pad/app.py
-    volumes:
-      - ./docker/anomaly-detector:/pad
+      - APP_FILE=app.py
     ports:
       - 8070:8080
     networks:
