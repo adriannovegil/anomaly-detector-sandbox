@@ -15,7 +15,7 @@ services:
       - FLT_DEBUG_MODE=True
       - APP_FILE=/pad/app.py
     volumes:
-      - .:/pad
+      - ./anomaly-detector:/pad
     ports:
       - 8070:8080
     networks:
@@ -24,22 +24,27 @@ services:
     labels:
       org.label-schema.group: "observability"
 
-  # Anomaly Prometheus Server
+  # Prometheus - anomaly detector
   anomaly-prometheus-server:
     image: prom/prometheus:v2.29.2
     volumes:
       - ./docker/prometheus-server/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheusserver_anomaly_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
-      - 9080:9090
+      - 9098:9090
     networks:
       - observabilitysandbox
     restart: always
     labels:
       org.label-schema.group: "observability"
 
-  # Anomaly Grafana Server
+  # Grafana - anomaly detector
   anomaly-grafana-server:
     image: grafana/grafana:8.1.2
     environment:
@@ -50,10 +55,10 @@ services:
     volumes:
       - ./docker/grafana-server/etc:/etc/grafana:ro
       - ./docker/grafana-server/dashboards:/var/lib/grafana/dashboards
-      - grafana-lib:/var/lib/grafana
-      - grafana-log:/var/log/grafana
+      - grafana-lib-anomaly:/var/lib/grafana
+      - grafana-log-anomaly:/var/log/grafana
     ports:
-      - 3001:3000
+      - 3002:3000
     networks:
       - observabilitysandbox
     restart: always
@@ -61,9 +66,10 @@ services:
       org.label-schema.group: "observability"
 
 volumes:
-  grafana-lib:
+  prometheusserver_anomaly_data: {}
+  grafana-lib-anomaly:
     external: false
-  grafana-log:
+  grafana-log-anomaly:
     external: false
 
 networks:
